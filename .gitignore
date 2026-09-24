@@ -1,0 +1,63 @@
+# Dependencies
+node_modules/
+.docx-deps/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Logs
+logs/
+*.log
+
+# Runtime / temp files
+server.pid
+*.pid
+tmpfile*.txt
+*.tmp.*
+.DS_Store
+__MACOSX/
+*.swp
+*.swo
+
+# Test artifacts
+test-results/
+playwright-report/
+playwright/.cache/
+test-results/
+
+# Local environment / secrets
+.env
+.env.local
+*.pem
+*.key
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# User data (privacy)
+memory/
+sessions/
+
+# User uploads (preserve directory, ignore contents)
+uploads/dialogs/
+uploads/extracted/
+uploads/*.tmp.*
+uploads/tmpfile*
+uploads/*.tmp
+uploads/dialog_*.json
+uploads/claude_msg_*.txt
+uploads/*_experience_*.txt
+uploads/简历_*
+uploads/*.pdf
+uploads/*.docx
+uploads/*.doc
+uploads/*.png
+uploads/*.PNG
+uploads/*.jpg
+uploads/*.jpeg
+uploads/*.html
+uploads/*.zip
