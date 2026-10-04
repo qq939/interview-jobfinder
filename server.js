@@ -562,6 +562,44 @@ http.createServer(function(req, res) {
     return;
   }
 
+  // 上传文件到 OBS（http://obs.dimond.top，仅支持根路径）
+  if (req.method === 'POST' && url === '/api/uploads/upload-to-obs') {
+    parseFormData(req).then(function(form){
+      // parseFormData 把所有字段（含普通字段）都放在 files 数组里 — 通过 fieldName 区分
+      var name = '';
+      for (var i=0;i<form.files.length;i++){
+        if (form.files[i].fieldName === 'fileName') { name = form.files[i].data.toString('utf8'); break; }
+      }
+      if (!name) { res.writeHead(400,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'缺少 fileName 字段'})); return; }
+      // 保留原始中文 / Unicode 文件名（uploads/ 里很多文件是外部直接拷贝进来的，未经过 ASCII 化）
+      var safe = path.basename(name).replace(/[/\\\x00]/g, '_');
+      var filePath = path.join(UPLOAD_DIR, safe);
+      if (!filePath.startsWith(UPLOAD_DIR + path.sep)) { res.writeHead(403,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'Forbidden'})); return; }
+      if (!fs.existsSync(filePath)) { res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'本地文件不存在'})); return; }
+      var buf = fs.readFileSync(filePath);
+      var ext = path.extname(safe).toLowerCase();
+      var mimeMap = {'.pdf':'application/pdf','.docx':'application/vnd.openxmlformats-officedocument.wordprocessingml.document','.doc':'application/msword','.txt':'text/plain','.html':'text/html','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.json':'application/json'};
+      var mime = mimeMap[ext] || 'application/octet-stream';
+      var encoded = encodeURIComponent(safe);
+      var reqOpts = {hostname:'obs.dimond.top',port:80,path:'/'+encoded,method:'PUT',headers:{'Content-Length':buf.length,'Content-Type':mime,'Access-Control-Allow-Origin':'*'}};
+      var obsReq = http.request(reqOpts, function(obsRes){
+        var body = '';
+        obsRes.on('data', function(c){ body += c; });
+        obsRes.on('end', function(){
+          res.writeHead(200, {'Content-Type':'application/json','Access-Control-Allow-Origin':'*'});
+          res.end(JSON.stringify({ok: obsRes.statusCode===200||obsRes.statusCode===201, status: obsRes.statusCode, fileName: safe, obsUrl:'http://obs.dimond.top/'+encoded, response: body.slice(0,500)}));
+        });
+      });
+      obsReq.on('error', function(e){
+        res.writeHead(500, {'Content-Type':'application/json'});
+        res.end(JSON.stringify({error:'OBS 请求失败: '+e.message}));
+      });
+      obsReq.write(buf);
+      obsReq.end();
+    }).catch(function(e){ res.writeHead(500,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:e.message})); });
+    return;
+  }
+
   // 静态文件服务（uploads目录）
   if (url.startsWith('/uploads/')) {
     var filePath = path.resolve(__dirname, '.' + decodeURIComponent(url));

@@ -86,7 +86,9 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 </div>
 <div id=tmpfile-section class=tmpfile-section style="flex:1;background:#1c2128;border:1px solid #30363d;border-radius:8px;padding:0.8rem;overflow:hidden;display:flex;flex-direction:column;">
 <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
-<span id=tmpfile-status style="font-size:0.7rem;color:#8b949e;"></span>
+<span id=tmpfile-status style="font-size:0.7rem;color:#8b949e;flex:1;"></span>
+<button id=obs-upload-btn style="font-size:0.7rem;padding:0.25rem 0.6rem;background:#238636;border:1px solid #2ea043;color:#fff;border-radius:4px;cursor:pointer;display:none;" onclick="uploadCurrentFileToOBS()">↑ 上传到 OBS</button>
+<span id=obs-upload-result style="font-size:0.7rem;color:#8b949e;"></span>
 </div>
 <pre id=tmpfile-content style="font-size:0.7rem;color:#c9d1d9;white-space:pre-wrap;word-break:break-all;overflow-y:auto;margin:0;font-family:monospace;flex:1;display:none;"></pre>
 <iframe id=tmpfile-iframe style="flex:1;width:100%;border:none;display:none;background:#fff;border-radius:4px;"></iframe>
@@ -111,6 +113,9 @@ var tmpfileSection=document.getElementById("tmpfile-section");
 var tmpfileContent=document.getElementById("tmpfile-content");
 var tmpfileIframe=document.getElementById("tmpfile-iframe");
 var tmpfileStatus=document.getElementById("tmpfile-status");
+var obsUploadBtn=document.getElementById("obs-upload-btn");
+var obsUploadResult=document.getElementById("obs-upload-result");
+var selectedFileName="";
 var tmpfilePollInterval=null;
 var isSending=false;
 // 自定义文件选择器（替代原 <select>）：左文件名 / 右创建时间；通过 fileSelector.value 暴露当前选中文件名
@@ -390,10 +395,16 @@ function loadFileSelector(){
 }
 function showFilePreview(fileName){
   if(!fileName){
+    selectedFileName="";
+    obsUploadBtn.style.display="none";
+    obsUploadResult.textContent="";
     tmpfileContent.textContent="";
     tmpfileStatus.textContent="";
     return;
   }
+  selectedFileName=fileName;
+  obsUploadBtn.style.display="inline-block";
+  obsUploadResult.textContent="";
   tmpfileStatus.textContent="加载中...";
   fetch(appPath("/api/uploads/file/"+encodeURIComponent(fileName)))
   .then(function(r){return r.json();})
@@ -435,6 +446,35 @@ function showFilePreview(fileName){
     tmpfileIframe.style.display="none";
     tmpfileContent.textContent="加载失败: "+e.message;
     tmpfileStatus.textContent="";
+  });
+}
+
+function uploadCurrentFileToOBS(){
+  if(!selectedFileName){ obsUploadResult.textContent="请先选中文件"; return; }
+  obsUploadBtn.disabled=true;
+  var origText=obsUploadBtn.textContent;
+  obsUploadBtn.textContent="上传中...";
+  obsUploadResult.textContent="";
+  var fd=new FormData();
+  fd.append("fileName", selectedFileName);
+  fetch(appPath("/api/uploads/upload-to-obs"), {method:"POST", body:fd})
+  .then(function(r){return r.json();})
+  .then(function(data){
+    obsUploadBtn.disabled=false;
+    obsUploadBtn.textContent=origText;
+    if(data.ok){
+      obsUploadResult.style.color="#3fb950";
+      obsUploadResult.innerHTML='✓ '+data.obsUrl+' <a href="'+data.obsUrl+'" target="_blank" style="color:#58a6ff;">打开</a>';
+    }else{
+      obsUploadResult.style.color="#f85149";
+      obsUploadResult.textContent="✗ 失败 (HTTP "+data.status+"): "+(data.response||data.error||"");
+    }
+  })
+  .catch(function(e){
+    obsUploadBtn.disabled=false;
+    obsUploadBtn.textContent=origText;
+    obsUploadResult.style.color="#f85149";
+    obsUploadResult.textContent="✗ "+e.message;
   });
 }
 // 注：自定义列表在 click handler 中已直接调用 showFilePreview()，无需 change 事件

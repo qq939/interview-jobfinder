@@ -47,6 +47,13 @@
 
 后端 DOCX 预览使用 [mammoth](https://github.com/mwilliamson/mammoth.js) 将 DOCX 转换为标准 HTML（中文、表格、列表、内联图片均保留），前端通过 iframe `srcdoc` 渲染，不引入额外前端依赖。
 
+### 一键上传到 OBS
+预览区域右上角有 **「↑ 上传到 OBS」** 按钮，点击后调用 `POST /api/uploads/upload-to-obs`，服务端读取 `uploads/` 下的本地文件 → PUT 到 `http://obs.dimond.top/<encoded filename>`。上传成功后在按钮旁显示 OBS URL（含「打开」链接）。
+
+- 仅支持根路径（OBS endpoint 不支持子目录，文件名已 `encodeURIComponent`）
+- 保留中文字符（uploads/ 里的文件可能是外部直接拷贝，未走 ASCII 化）
+- 10MB 以下文件；PDF / DOCX / DOC / TXT / 图片均支持
+
 ## 技术栈
 
 - **Node.js** v20.20.2 + 原生 HTTP 服务器
@@ -123,6 +130,7 @@ npm install
 | `GET` | `/api/dialogs/:id` | 指定对话详情 |
 | `GET` | `/ask/claude?q=...` | Claude Ask（智能 base64 / URL-encode 识别） |
 | `POST` | `/api/dialogs/:id/append-generated` | 登记 Claude 产出文件 |
+| `POST` | `/api/uploads/upload-to-obs` | 把 `uploads/` 下的文件上传到 `obs.dimond.top`（表单字段 `fileName`） |
 
 详细规范参见 `systemreadme.md`。
 
