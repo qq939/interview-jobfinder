@@ -5,6 +5,7 @@ const AdmZip = require('adm-zip');
 const http = require('http');
 const { spawn } = require('child_process');
 const crypto = require('crypto');
+const mammoth = require('mammoth');
 
 const PORT = process.env.PORT || 8082;
 
@@ -849,6 +850,40 @@ http.createServer(function(req, res) {
           base64: base64,
           size: stat.size
         }));
+        return;
+      }
+
+      // DOCX 文件：使用 mammoth 转换为 HTML，前端 iframe srcdoc 渲染
+      if (['.docx'].indexOf(ext) !== -1) {
+        if (stat.size > 10 * 1024 * 1024) {
+          res.writeHead(200, {'Content-Type':'application/json'});
+          res.end(JSON.stringify({error: '文件过大（限制10MB）'}));
+          return;
+        }
+        mammoth.convertToHtml({path: filePath})
+          .then(function(result){
+            const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>' +
+              'body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;' +
+              'max-width:800px;margin:1rem auto;padding:0 1rem;line-height:1.6;color:#222;background:#fff;}' +
+              'table{border-collapse:collapse;width:100%;}td,th{border:1px solid #ddd;padding:6px 8px;}' +
+              'img{max-width:100%;}h1,h2,h3{margin-top:1em;}' +
+              '</style></head><body>' + result.value + '</body></html>';
+            res.writeHead(200, {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*'
+            });
+            res.end(JSON.stringify({
+              fileName: fileName,
+              type: 'docx-html',
+              html: html,
+              warnings: result.messages.length,
+              size: stat.size
+            }));
+          })
+          .catch(function(e){
+            res.writeHead(500, {'Content-Type':'application/json'});
+            res.end(JSON.stringify({error: 'DOCX 转换失败: ' + e.message}));
+          });
         return;
       }
 

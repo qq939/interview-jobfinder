@@ -410,6 +410,13 @@ function showFilePreview(fileName){
       var pdfData="data:"+data.mimeType+";base64,"+data.base64;
       tmpfileIframe.src=pdfData;
       tmpfileStatus.textContent="";
+    }else if(data.type==="docx-html"){
+      // DOCX 文件：mammoth 已转为 HTML，用 iframe srcdoc 渲染
+      tmpfileContent.style.display="none";
+      tmpfileIframe.style.display="block";
+      tmpfileIframe.removeAttribute("src");
+      tmpfileIframe.srcdoc=data.html;
+      tmpfileStatus.textContent = data.warnings ? "(有 "+data.warnings+" 条样式警告)" : "";
     }else if(data.content){
       // 文本文件直接显示
       tmpfileContent.style.display="block";

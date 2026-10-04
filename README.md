@@ -35,12 +35,25 @@
 ### 辅助能力
 - 简历改写与 OBS 上传（`obs.dimond.top`，HTTP PUT 根路径）
 
+### 文件预览（tmpfile 侧边栏）
+文件列表点击后，后端 `/api/uploads/file/<name>` 按扩展名返回不同结构，前端统一渲染：
+
+| 类型 | 后端响应 | 前端展示 |
+|------|---------|---------|
+| `.pdf` | `type:"embed"` + base64 | iframe 内嵌 `data:application/pdf` |
+| `.docx` | `type:"docx-html"` + 转换后的 HTML（mammoth） | iframe `srcdoc` 渲染，保留表格/列表/内联图片 |
+| `.txt` | `content` 字段（utf8 文本） | `<pre>` 纯文本 |
+| `.doc` 等其他二进制 | `type:"binary"` | `[二进制文件]` 提示 |
+
+后端 DOCX 预览使用 [mammoth](https://github.com/mwilliamson/mammoth.js) 将 DOCX 转换为标准 HTML（中文、表格、列表、内联图片均保留），前端通过 iframe `srcdoc` 渲染，不引入额外前端依赖。
+
 ## 技术栈
 
 - **Node.js** v20.20.2 + 原生 HTTP 服务器
 - **Claude AI CLI** 集成（`--continue` 保持上下文连贯，`--dangerously-skip-permissions` 跳过确认）
 - **SSE** (Server-Sent Events) 流式响应
 - **Playwright** 端到端测试
+- **mammoth** DOCX → HTML（文件预览）
 - **reportlab** + CID 字体（PDF 转换辅助）
 
 ## 项目结构
