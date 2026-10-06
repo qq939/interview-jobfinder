@@ -31,6 +31,7 @@
 - 对话持久化（`uploads/dialogs/`）
 - 历史对话默认显示最近 5 轮
 - tmpfile 侧边栏实时显示 prompt 上下文
+- **整页高度布局**：切到 AI 助手 Tab 时 `syncAiTabHeight()` 实测 `#ai-tab-wrapper` 视口偏移，令 `#chat-area` / `#tmpfile-sidebar` 高度撑满至视口底部，不被标题与 Tab 换行挤压（`resize` / `load` 自动重算）
 
 ### 辅助能力
 - 简历改写与 OBS 上传（`obs.dimond.top`，HTTP PUT 根路径）

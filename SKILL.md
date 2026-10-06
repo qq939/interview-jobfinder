@@ -1,7 +1,7 @@
 ---
 name: jobfinder-ai-assistant
 description: 面试 Jobfinder AI 助手 — 「字节跳动 · 面试题直通车」主页 AI 助手 Tab 的 Claude 对话面板，tmpfile 四段式提示词构造，上传文件 / 图片自动接管。
-version: v3.8.3 (2026-08-15)
+version: v3.8.4 (2026-10-06)
 ---
 
 # 面试 Jobfinder AI 助手
@@ -15,8 +15,9 @@ version: v3.8.3 (2026-08-15)
 3. **简历全自主改写** — 收到简历文件 / BOSS JD 截图 / 文字指令时，**完全自主**读源 + 重写 + 改名（`<场景>_<日期>.txt`）+ 删旧 + 上传 OBS，**不只给建议**。META 头含 date/time/session_id/summary/source/corrects/target/job
    - **简历交付格式硬约束**：写简历 → 仅产出 `.pdf` / `.doc` / `.docx`（用户最终对外投递用）。其他格式（`.txt` / `.md` / `.png` / `.html`）可作为**中间产物**登记到 `dialog.generatedFiles`，但**不进** `dialog.deliverables`（避免后续轮次 tmpfile 历史摘要把非简历文件当成简历复用）。
 4. **面试辅导** — 知识点串联、LeetCode 刷题、面试技巧
-5. **文件预览** — PDF / TXT / HTML 内嵌预览
+5. **文件预览** — PDF（base64 iframe）/ DOCX（mammoth → iframe `srcdoc`，保留表格 / 列表 / 内联图）/ TXT（`<pre>`）/ 其他二进制提示；预览区右上角可一键「↑ 上传到 OBS」
 6. **对话持久化** — `uploads/dialogs/dialog_<ts>_<hex>.json`，每次恢复最近 5 轮
+7. **整页高度布局** — 切到 AI 助手 Tab 时由 `syncAiTabHeight()`（顶层函数，page.html）实测 `#ai-tab-wrapper` 视口偏移，令 `#chat-area` 与 `#tmpfile-sidebar` 高度撑满至视口底部，不受标题 / Tab 换行影响；`resize` 与 `load` 时重算
 
 ## 用户基本信息（机器可识别）
 
