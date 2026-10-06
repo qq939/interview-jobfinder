@@ -17,7 +17,7 @@ version: v3.8.4 (2026-10-06)
 4. **面试辅导** — 知识点串联、LeetCode 刷题、面试技巧
 5. **文件预览** — PDF（base64 iframe）/ DOCX（mammoth → iframe `srcdoc`，保留表格 / 列表 / 内联图）/ TXT（`<pre>`）/ 其他二进制提示；预览区右上角可一键「↑ 上传到 OBS」
 6. **对话持久化** — `uploads/dialogs/dialog_<ts>_<hex>.json`，每次恢复最近 5 轮
-7. **两栏 app shell（右侧预览列「从顶至底」）** — AI 助手 Tab 下整页为居中 shell（`max-width:1440px`）：左侧「标题 + Tabs + 对话框」三者同宽对齐、`#chat-area` 撑到底部；右侧 `#tmpfile-sidebar` 由 `body.ai-active` 设为 `position:fixed`（`top/bottom:2rem`，`right:max(2rem,calc((100vw-1440px)/2+2rem))`）钉在 shell 右缘、自视口顶部贯通到底部，与左列恒定 24px 间隙，PDF / DOCX 预览 iframe 占满整列。`syncAiTabHeight()`（顶层函数，page.html）切 Tab 时增删 `body.ai-active` 并重算 `#chat-area` 高度，`resize` / `load` 重算；其它 Tab 不受影响（`<900px` 纵向堆叠）
+7. **全宽顶栏 + 两栏 app shell（宽度整体对齐）** — AI 助手 Tab 下整页为居中 shell（`max-width:1440px`）：顶部「标题 + Tabs」横跨整个 shell 宽度（左右边缘 = shell 外框左右边缘，居中）；其下左列 `#chat-area`、右列 `#tmpfile-sidebar` 两列同高、一起撑到页面底部。左列 `#ai-tab-wrapper{padding-right:344px}` 给右列留位；右列由 `body.ai-active` 设为 `position:fixed`（`bottom:2rem`，`top` 由 JS 设为 Tabs 下方，`right:max(2rem,calc((100vw-1440px)/2+2rem))`）贴 shell 右缘，与左列恒定 24px 间隙，PDF / DOCX 预览 iframe 占满整列。`syncAiTabHeight()`（顶层函数，page.html）切 Tab 时增删 `body.ai-active` 并重算 `#chat-area` 高度与右列顶部，`resize` / `load` 重算；其它 Tab 不受影响（`<900px` 纵向堆叠）
 
 ## 用户基本信息（机器可识别）
 

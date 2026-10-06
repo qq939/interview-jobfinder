@@ -56,18 +56,21 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 body.ai-active{
   box-sizing:border-box;
   max-width:1440px;margin:0 auto;
-  padding-right:376px;   /* 320 右列 + 2rem 右距 + 1.5rem 间隙，让给右列 */
 }
+/* 顶部「标题 + Tabs」横跨整个 shell（左右边缘 = 整页外框的左右边缘）；
+   下方左列是对话框，右列是预览栏，两列同高、一起撑到页面底部。
+   左列让出右列的位置：320 右列 + 1.5rem 间隙 = 344px */
+body.ai-active #ai-tab-wrapper{padding-right:344px;}
 body.ai-active #tmpfile-sidebar{
-  position:fixed;top:2rem;bottom:2rem;left:auto;
+  position:fixed;bottom:2rem;left:auto;
   width:320px;height:auto;max-height:none;margin:0;z-index:30;
-  /* 超宽屏时 shell 居中，右列随之贴合 shell 右缘（与左列始终 1.5rem 间隙） */
+  /* top 由 JS 设为 Tabs 下方（与左列对齐）；超宽屏时 shell 居中，右列随之贴合 shell 右缘 */
   right:max(2rem, calc((100vw - 1440px) / 2 + 2rem));
 }
 @media (max-width:900px){
   body.ai-active{max-width:none;padding:1rem;}
   body.ai-active #tmpfile-sidebar{position:static;width:auto;height:auto;margin-top:1rem;}
-  body.ai-active #ai-tab-wrapper{flex-direction:column;}
+  body.ai-active #ai-tab-wrapper{flex-direction:column;padding-right:0;}
 }
 </style></head><body class=ai-active><div class=header><h1>&#128293; 字节跳动 · 面试题直通车</h1><p>按岗位分类 · 数据来源：<strong>Nowcoder 面经</strong>（约120+篇，190+条算法题）</p><p style="margin-top:0.4rem;color:#3fb950;">&#10003; 每题均附 LeetCode 刷题链接，点按钮即可跳转</p></div><div class=tabs id=mainTabs><button class=tab-btn active style="background:#ff7b9c;border-color:#ff7b9c;color:#fff" data-tab="AI助手" onclick="switchTab(this)">AI助手</button><button class=tab-btn style="" data-tab="后端" onclick="switchTab(this)">后端</button><button class=tab-btn style="" data-tab="客户端" onclick="switchTab(this)">客户端</button><button class=tab-btn style="" data-tab="前端" onclick="switchTab(this)">前端</button><button class=tab-btn style="" data-tab="算法岗" onclick="switchTab(this)">算法岗</button><button class=tab-btn style="" data-tab="测试岗" onclick="switchTab(this)">测试岗</button><button class=tab-btn style="" data-tab="合规认证" onclick="switchTab(this)">合规认证</button><button class=tab-btn style="" data-tab="零信任安全" onclick="switchTab(this)">零信任安全</button><button class=tab-btn style="" data-tab="云安全" onclick="switchTab(this)">云安全</button><button class=tab-btn style="" data-tab="身份权限" onclick="switchTab(this)">身份权限</button><button class=tab-btn style="" data-tab="SQL" onclick="switchTab(this)">SQL</button><button class=tab-btn style="" data-tab="Supabase" onclick="switchTab(this)">Supabase</button><button class=tab-btn style="" data-tab="JavaScript" onclick="switchTab(this)">JavaScript</button><button class=tab-btn style="" data-tab="TypeScript" onclick="switchTab(this)">TypeScript</button><button class=tab-btn style="" data-tab="ModbusTCP" onclick="switchTab(this)">Modbus TCP</button></div><div id=tab-AI助手 class="tab-content active"><div id=ai-tab-wrapper style="display:flex;gap:1rem;">
 <div id=chat-area style="flex:1;background:#161b22;border:1px solid #30363d;border-radius:12px;padding:1rem;height:calc(100vh - 200px);display:flex;flex-direction:column;">
@@ -686,11 +689,15 @@ function syncAiTabHeight(){
   document.body.classList.toggle("ai-active", active);
   if(!active) return;
   var chat = document.getElementById("chat-area");
-  if(chat){
-    var top = wrap.getBoundingClientRect().top; /* 视口坐标：无需加 scrollY */
-    var h = window.innerHeight - top - 32;      /* 32 = body 底部留白 (2rem) */
-    if(h < 360) h = 360;
-    chat.style.height = h + "px";               /* 左侧对话框：从 Tabs 下方撑到底部 */
+  var side = document.getElementById("tmpfile-sidebar");
+  var top = wrap.getBoundingClientRect().top; /* 视口坐标：无需加 scrollY */
+  var h = window.innerHeight - top - 32;      /* 32 = body 底部留白 (2rem) */
+  if(h < 360) h = 360;
+  /* 左、右两列同高：都从 Tabs 下方撑到页面底部（右列 top/bottom 对齐左列） */
+  if(chat) chat.style.height = h + "px";
+  if(side){
+    if(window.innerWidth > 900){ side.style.top = top + "px"; }
+    else { side.style.top = ""; side.style.height = ""; }
   }
 }
 window.addEventListener("resize", syncAiTabHeight);

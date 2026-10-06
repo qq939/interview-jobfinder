@@ -31,9 +31,9 @@
 - 对话持久化（`uploads/dialogs/`）
 - 历史对话默认显示最近 5 轮
 - tmpfile 侧边栏实时显示 prompt 上下文
-- **两栏 app shell：右侧预览列「从顶至底」**：AI 助手 Tab 下整页是一个居中的 shell（`max-width:1440px`，超宽屏不无限拉伸）。左侧「标题 + Tabs + 对话框」共用同一列宽（三者左右边缘对齐，`#chat-area` 撑到底部）；右侧 `#tmpfile-sidebar` 用 `position:fixed`（`top/bottom:2rem`）钉在 shell 右缘、自视口顶部贯通到底部，与左列恒定 24px 间隙，PDF / DOCX 预览 iframe 占满整列。
-  - 实现：`body.ai-active{padding-right:376px}` 给右列留位；右列 `right:max(2rem,calc((100vw - 1440px)/2 + 2rem))` 令其在超宽屏下仍贴合 shell 右缘。
-  - 切 Tab 时 `syncAiTabHeight()`（page.html 顶层函数）按状态增删 `body.ai-active` 并重算 `#chat-area` 高度，`resize` / `load` 自动重算；其它 Tab 布局完全不受影响（`<900px` 时降级为纵向堆叠）。
+- **全宽顶栏 + 两栏 app shell：宽度整体对齐**：AI 助手 Tab 下整页是一个居中的 shell（`max-width:1440px`，超宽屏不无限拉伸）。顶部「标题 + Tabs」横跨整个 shell 宽度（左右边缘 = shell 外框左右边缘，居中）；其下左列 `#chat-area`、右列 `#tmpfile-sidebar` 两列同高、一起撑到页面底部，右列贴 shell 右缘、与左列恒定 24px 间隙，PDF / DOCX 预览 iframe 占满整列。
+  - 实现：`body.ai-active` 让顶栏占满 shell 宽度；左列 `#ai-tab-wrapper{padding-right:344px}`（320 右列 + 1.5rem 间隙）给右列留位；右列 `position:fixed`（`bottom:2rem`，`top` 由 JS 设为 Tabs 下方）并 `right:max(2rem,calc((100vw - 1440px)/2 + 2rem))` 令其在超宽屏下仍贴合 shell 右缘。
+  - 切 Tab 时 `syncAiTabHeight()`（page.html 顶层函数）按状态增删 `body.ai-active`、重算 `#chat-area` 与右列的顶部/高度，`resize` / `load` 自动重算；其它 Tab 布局完全不受影响（`<900px` 时降级为纵向堆叠）。
 - 布局截图见 `docs/screenshots/`
 
 ### 辅助能力
