@@ -45,18 +45,31 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .history-time{font-size:0.7rem;color:#8b949e;white-space:nowrap;}
 .history-preview{flex:1;font-size:0.8rem;color:#c9d1d9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
-/* AI 助手 tab：左侧=标题+Tabs+对话框；右侧预览列「从顶至底」贯穿整页 */
-#tab-AI助手.active{display:flex;flex-direction:column;}
-#ai-tab-wrapper{flex:1;min-height:0;align-items:stretch;}
-#chat-area{min-height:360px;}
-/* 激活 AI 助手时：给固定右侧预览列让出空间（320 侧栏 + 2rem 右距 + 间隙），
-   并把 #tmpfile-sidebar 钉在视口右侧，top/bottom 均为 2rem → 顶底贯通 */
-body.ai-active{padding-right:368px;}
-body.ai-active #tmpfile-sidebar{
-  position:fixed;top:2rem;right:2rem;bottom:2rem;left:auto;
-  width:320px;height:auto;max-height:none;margin:0;z-index:30;
+/* ===== AI 助手 Tab 布局：左侧「标题 + Tabs + 对话框」，右侧预览列「从顶至底」 =====
+   整页是一个居中的 app shell（超宽屏不无限拉伸）：左列占满剩余宽度，
+   右列 #tmpfile-sidebar 钉在 shell 右缘、自视口顶部贯通到底部。
+   由 JS 按当前 Tab 增删 body.ai-active 来开/关该布局。 */
+#tab-AI助手.active{display:flex;flex-direction:column;min-height:0;}
+#ai-tab-wrapper{display:flex;flex:1;min-height:0;}
+#chat-area{flex:1;min-width:0;min-height:360px;}
+
+body.ai-active{
+  box-sizing:border-box;
+  max-width:1440px;margin:0 auto;
+  padding-right:376px;   /* 320 右列 + 2rem 右距 + 1.5rem 间隙，让给右列 */
 }
-</style></head><body class=ai-active><div class=header><h1>&#128293; 字节跳动 · 面试题直通车</h1><p>按岗位分类 · 数据来源：<strong>Nowcoder 面经</strong>（约120+篇，190+条算法题）</p><p style="margin-top:0.4rem;color:#3fb950;">&#10003; 每题均附 LeetCode 刷题链接，点按钮即可跳转</p></div><div class=tabs id=mainTabs><button class=tab-btn active style="background:#ff7b9c;border-color:#ff7b9c;color:#fff" data-tab="AI助手" onclick="switchTab(this)">AI助手</button><button class=tab-btn style="" data-tab="后端" onclick="switchTab(this)">后端</button><button class=tab-btn style="" data-tab="客户端" onclick="switchTab(this)">客户端</button><button class=tab-btn style="" data-tab="前端" onclick="switchTab(this)">前端</button><button class=tab-btn style="" data-tab="算法岗" onclick="switchTab(this)">算法岗</button><button class=tab-btn style="" data-tab="测试岗" onclick="switchTab(this)">测试岗</button><button class=tab-btn style="" data-tab="合规认证" onclick="switchTab(this)">合规认证</button><button class=tab-btn style="" data-tab="零信任安全" onclick="switchTab(this)">零信任安全</button><button class=tab-btn style="" data-tab="云安全" onclick="switchTab(this)">云安全</button><button class=tab-btn style="" data-tab="身份权限" onclick="switchTab(this)">身份权限</button><button class=tab-btn style="" data-tab="SQL" onclick="switchTab(this)">SQL</button><button class=tab-btn style="" data-tab="Supabase" onclick="switchTab(this)">Supabase</button><button class=tab-btn style="" data-tab="JavaScript" onclick="switchTab(this)">JavaScript</button><button class=tab-btn style="" data-tab="TypeScript" onclick="switchTab(this)">TypeScript</button><button class=tab-btn style="" data-tab="ModbusTCP" onclick="switchTab(this)">Modbus TCP</button></div><div id=tab-AI助手 class="tab-content active"><div id=ai-tab-wrapper style="display:flex;gap:1rem;max-width:1200px;margin:0 auto;align-items:stretch;">
+body.ai-active #tmpfile-sidebar{
+  position:fixed;top:2rem;bottom:2rem;left:auto;
+  width:320px;height:auto;max-height:none;margin:0;z-index:30;
+  /* 超宽屏时 shell 居中，右列随之贴合 shell 右缘（与左列始终 1.5rem 间隙） */
+  right:max(2rem, calc((100vw - 1440px) / 2 + 2rem));
+}
+@media (max-width:900px){
+  body.ai-active{max-width:none;padding:1rem;}
+  body.ai-active #tmpfile-sidebar{position:static;width:auto;height:auto;margin-top:1rem;}
+  body.ai-active #ai-tab-wrapper{flex-direction:column;}
+}
+</style></head><body class=ai-active><div class=header><h1>&#128293; 字节跳动 · 面试题直通车</h1><p>按岗位分类 · 数据来源：<strong>Nowcoder 面经</strong>（约120+篇，190+条算法题）</p><p style="margin-top:0.4rem;color:#3fb950;">&#10003; 每题均附 LeetCode 刷题链接，点按钮即可跳转</p></div><div class=tabs id=mainTabs><button class=tab-btn active style="background:#ff7b9c;border-color:#ff7b9c;color:#fff" data-tab="AI助手" onclick="switchTab(this)">AI助手</button><button class=tab-btn style="" data-tab="后端" onclick="switchTab(this)">后端</button><button class=tab-btn style="" data-tab="客户端" onclick="switchTab(this)">客户端</button><button class=tab-btn style="" data-tab="前端" onclick="switchTab(this)">前端</button><button class=tab-btn style="" data-tab="算法岗" onclick="switchTab(this)">算法岗</button><button class=tab-btn style="" data-tab="测试岗" onclick="switchTab(this)">测试岗</button><button class=tab-btn style="" data-tab="合规认证" onclick="switchTab(this)">合规认证</button><button class=tab-btn style="" data-tab="零信任安全" onclick="switchTab(this)">零信任安全</button><button class=tab-btn style="" data-tab="云安全" onclick="switchTab(this)">云安全</button><button class=tab-btn style="" data-tab="身份权限" onclick="switchTab(this)">身份权限</button><button class=tab-btn style="" data-tab="SQL" onclick="switchTab(this)">SQL</button><button class=tab-btn style="" data-tab="Supabase" onclick="switchTab(this)">Supabase</button><button class=tab-btn style="" data-tab="JavaScript" onclick="switchTab(this)">JavaScript</button><button class=tab-btn style="" data-tab="TypeScript" onclick="switchTab(this)">TypeScript</button><button class=tab-btn style="" data-tab="ModbusTCP" onclick="switchTab(this)">Modbus TCP</button></div><div id=tab-AI助手 class="tab-content active"><div id=ai-tab-wrapper style="display:flex;gap:1rem;">
 <div id=chat-area style="flex:1;background:#161b22;border:1px solid #30363d;border-radius:12px;padding:1rem;height:calc(100vh - 200px);display:flex;flex-direction:column;">
 <div id=history-section class=history-section style="display:none;">
 <h3 style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;" onclick="toggleHistory()">
@@ -83,7 +96,7 @@ body.ai-active #tmpfile-sidebar{
 <span style="animation:pulse 1.5s infinite;">AI 思考中...</span>
 </div>
 </div>
-<div id=tmpfile-sidebar style="width:320px;background:#161b22;border:1px solid #30363d;border-radius:12px;padding:1rem;height:calc(100vh - 200px);display:flex;flex-direction:column;flex-shrink:0;">
+<div id=tmpfile-sidebar style="width:320px;background:#161b22;border:1px solid #30363d;border-radius:12px;padding:1rem;display:flex;flex-direction:column;flex-shrink:0;">
 <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.8rem;padding-bottom:0.8rem;border-bottom:1px solid #30363d;">
 <span style="font-size:1.2rem;">&#128196;</span>
 <span style="font-size:1rem;font-weight:600;color:#c9d1d9;">tmpfile.txt</span>
@@ -672,8 +685,6 @@ function syncAiTabHeight(){
      非 AI 助手 tab 时移除类，避免影响其它 tab 布局 */
   document.body.classList.toggle("ai-active", active);
   if(!active) return;
-  var side = document.getElementById("tmpfile-sidebar");
-  if(side) side.style.height = ""; /* 清掉旧的 calc(100vh - 200px)，让 fixed 的 top/bottom 生效 */
   var chat = document.getElementById("chat-area");
   if(chat){
     var top = wrap.getBoundingClientRect().top; /* 视口坐标：无需加 scrollY */
