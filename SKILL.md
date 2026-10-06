@@ -17,7 +17,7 @@ version: v3.8.4 (2026-10-06)
 4. **面试辅导** — 知识点串联、LeetCode 刷题、面试技巧
 5. **文件预览** — PDF（base64 iframe）/ DOCX（mammoth → iframe `srcdoc`，保留表格 / 列表 / 内联图）/ TXT（`<pre>`）/ 其他二进制提示；预览区右上角可一键「↑ 上传到 OBS」
 6. **对话持久化** — `uploads/dialogs/dialog_<ts>_<hex>.json`，每次恢复最近 5 轮
-7. **整页高度布局** — 切到 AI 助手 Tab 时由 `syncAiTabHeight()`（顶层函数，page.html）实测 `#ai-tab-wrapper` 视口偏移，令 `#chat-area` 与 `#tmpfile-sidebar` 高度撑满至视口底部，不受标题 / Tab 换行影响；`resize` 与 `load` 时重算
+7. **右侧预览列「从顶至底」** — AI 助手 Tab 下 `#tmpfile-sidebar` 由 CSS `body.ai-active` 设为 `position:fixed`（`top/bottom:2rem`），自页面顶部贯通到底部，PDF / DOCX 预览 iframe 占满整列；左侧为标题 + Tabs + 对话框。`syncAiTabHeight()`（顶层函数，page.html）在切换 Tab 时增删 `body.ai-active` 并重算 `#chat-area` 高度，`resize` / `load` 时重算；其它 Tab 布局不受影响
 
 ## 用户基本信息（机器可识别）
 

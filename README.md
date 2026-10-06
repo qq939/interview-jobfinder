@@ -31,7 +31,8 @@
 - 对话持久化（`uploads/dialogs/`）
 - 历史对话默认显示最近 5 轮
 - tmpfile 侧边栏实时显示 prompt 上下文
-- **整页高度布局**：切到 AI 助手 Tab 时 `syncAiTabHeight()` 实测 `#ai-tab-wrapper` 视口偏移，令 `#chat-area` / `#tmpfile-sidebar` 高度撑满至视口底部，不被标题与 Tab 换行挤压（`resize` / `load` 自动重算）
+- **右侧预览列「从顶至底」**：AI 助手 Tab 下 `#tmpfile-sidebar` 用 `position:fixed`（`top/bottom: 2rem`）钉在视口右侧，从页面顶部贯通到底部，PDF / DOCX 预览 iframe 随之占满整列；左侧为标题 + Tabs + 对话框（`#chat-area` 撑到底部）。切 Tab 时 `syncAiTabHeight()` 增删 `body.ai-active`（右侧让出 368px 并重算高度），`resize` / `load` 自动重算；其它 Tab 不受影响
+- 布局截图见 `docs/screenshots/`
 
 ### 辅助能力
 - 简历改写与 OBS 上传（`obs.dimond.top`，HTTP PUT 根路径）
